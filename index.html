@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Speakset</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="server-rail" aria-label="Servers">
+        <button class="server-pill active" aria-label="Speakset Home">S</button>
+        <button class="server-pill" aria-label="Gaming Hub">G</button>
+        <button class="server-pill" aria-label="Study Club">📚</button>
+        <button class="server-pill" aria-label="Music Room">🎵</button>
+        <button class="server-pill add" aria-label="Add server">+</button>
+      </aside>
+
+      <aside class="channel-panel">
+        <header class="server-header">
+          <h1>Speakset</h1>
+          <button aria-label="Server settings">▾</button>
+        </header>
+
+        <section class="channel-group">
+          <h2>Text Channels</h2>
+          <button class="channel active"># general</button>
+          <button class="channel"># introductions</button>
+          <button class="channel"># memes</button>
+          <button class="channel"># support</button>
+        </section>
+
+        <section class="channel-group">
+          <h2>Voice Channels</h2>
+          <button class="channel">🔊 Lounge</button>
+          <button class="channel">🔊 Focus Room</button>
+        </section>
+
+        <footer class="profile-card">
+          <div class="avatar">SS</div>
+          <div>
+            <p class="name">speakset-user</p>
+            <p class="status">Online</p>
+          </div>
+          <button aria-label="User settings">⚙</button>
+        </footer>
+      </aside>
+
+      <main class="chat-panel">
+        <header class="chat-header">
+          <div class="chat-title"># general</div>
+          <div class="chat-actions" aria-hidden="true">📌 👥 🔍</div>
+        </header>
+
+        <section class="message-list" aria-label="Messages">
+          <article class="message">
+            <div class="avatar">AL</div>
+            <div>
+              <p><strong>alex</strong> <span>Today at 9:32 AM</span></p>
+              <p>Welcome to Speakset! This is our Discord-inspired community space.</p>
+            </div>
+          </article>
+          <article class="message">
+            <div class="avatar">JT</div>
+            <div>
+              <p><strong>jordan</strong> <span>Today at 9:34 AM</span></p>
+              <p>
+                Loving the new layout. It feels familiar, but the Speakset branding is clean.
+              </p>
+            </div>
+          </article>
+          <article class="message">
+            <div class="avatar">NM</div>
+            <div>
+              <p><strong>nina</strong> <span>Today at 9:36 AM</span></p>
+              <p>Drop your favorite productivity tips in #general 👇</p>
+            </div>
+          </article>
+        </section>
+
+        <form class="message-input" id="message-form">
+          <label for="message" class="sr-only">Type a message</label>
+          <input
+            id="message"
+            type="text"
+            autocomplete="off"
+            placeholder="Message #general"
+          />
+          <button type="submit">Send</button>
+        </form>
+      </main>
+
+      <aside class="member-panel">
+        <h2>Members — 4</h2>
+        <ul>
+          <li><span class="dot online"></span> speakset-user</li>
+          <li><span class="dot online"></span> alex</li>
+          <li><span class="dot idle"></span> jordan</li>
+          <li><span class="dot dnd"></span> nina</li>
+        </ul>
+      </aside>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

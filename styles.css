@@ -1,0 +1,275 @@
+:root {
+  --bg-primary: #313338;
+  --bg-secondary: #2b2d31;
+  --bg-tertiary: #1e1f22;
+  --bg-accent: #383a40;
+  --text-main: #f2f3f5;
+  --text-muted: #b5bac1;
+  --brand: #5865f2;
+  --success: #23a55a;
+  --idle: #f0b232;
+  --dnd: #f23f43;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Inter", sans-serif;
+  background: var(--bg-tertiary);
+  color: var(--text-main);
+}
+
+.app-shell {
+  display: grid;
+  grid-template-columns: 72px 260px 1fr 240px;
+  height: 100vh;
+}
+
+.server-rail {
+  background: #1a1b1e;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 0;
+}
+
+.server-pill {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  border: 0;
+  color: var(--text-main);
+  background: var(--bg-accent);
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.server-pill:hover,
+.server-pill.active {
+  border-radius: 12px;
+  background: var(--brand);
+}
+
+.server-pill.add {
+  color: #3ba55c;
+  background: #232428;
+}
+
+.channel-panel,
+.member-panel {
+  background: var(--bg-secondary);
+}
+
+.server-header,
+.chat-header {
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  border-bottom: 1px solid #232428;
+}
+
+.server-header h1,
+.member-panel h2 {
+  font-size: 1rem;
+  margin: 0;
+}
+
+.server-header button {
+  background: transparent;
+  border: 0;
+  color: var(--text-muted);
+}
+
+.channel-group {
+  padding: 16px 8px 0;
+}
+
+.channel-group h2 {
+  margin: 0 8px 8px;
+  color: #949ba4;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+}
+
+.channel {
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  color: var(--text-muted);
+  border-radius: 6px;
+  padding: 8px;
+  margin: 2px 0;
+  cursor: pointer;
+}
+
+.channel:hover,
+.channel.active {
+  background: #404249;
+  color: var(--text-main);
+}
+
+.profile-card {
+  margin-top: auto;
+  background: #232428;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  position: absolute;
+  bottom: 0;
+  width: 260px;
+}
+
+.channel-panel {
+  position: relative;
+  padding-bottom: 64px;
+}
+
+.avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #5d6773;
+  display: grid;
+  place-items: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.name {
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.status {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+.chat-panel {
+  background: var(--bg-primary);
+  display: grid;
+  grid-template-rows: 56px 1fr auto;
+}
+
+.chat-title {
+  font-weight: 600;
+}
+
+.message-list {
+  overflow-y: auto;
+  padding: 14px 16px;
+}
+
+.message {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.message p {
+  margin: 0 0 6px;
+}
+
+.message span {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+.message-input {
+  display: flex;
+  gap: 8px;
+  margin: 0 16px 16px;
+  background: #383a40;
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.message-input input {
+  flex: 1;
+  border: 0;
+  background: transparent;
+  color: var(--text-main);
+  font-size: 0.95rem;
+  padding: 8px;
+  outline: none;
+}
+
+.message-input button {
+  border: 0;
+  background: var(--brand);
+  color: white;
+  border-radius: 6px;
+  padding: 0 14px;
+  cursor: pointer;
+}
+
+.member-panel {
+  border-left: 1px solid #232428;
+  padding: 16px;
+}
+
+.member-panel ul {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+}
+
+.member-panel li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.dot.online {
+  background: var(--success);
+}
+
+.dot.idle {
+  background: var(--idle);
+}
+
+.dot.dnd {
+  background: var(--dnd);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+@media (max-width: 1100px) {
+  .app-shell {
+    grid-template-columns: 72px 240px 1fr;
+  }
+
+  .member-panel {
+    display: none;
+  }
+}
