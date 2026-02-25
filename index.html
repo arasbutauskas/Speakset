@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Speakset — Clean. Fast. Private.</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="auth-screen" class="auth-screen">
+      <div class="auth-card">
+        <h1>Speakset</h1>
+        <p>Clean. Fast. Private.</p>
+        <form id="login-form" class="auth-form">
+          <label>
+            Username
+            <input id="username" required maxlength="20" placeholder="dev_nova" />
+          </label>
+          <label>
+            Password
+            <input id="password" type="password" required minlength="4" placeholder="••••••••" />
+          </label>
+          <label>
+            Optional avatar upload
+            <input id="avatar" type="file" accept="image/*" />
+          </label>
+          <button type="submit">Login with JWT</button>
+        </form>
+        <small id="auth-meta"></small>
+      </div>
+    </div>
+
+    <div id="app" class="app hidden">
+      <aside class="space-rail">
+        <div class="brand-pill">S</div>
+        <button id="create-space" class="rail-action">+ Space</button>
+        <ul id="space-list" class="space-list" aria-label="Spaces"></ul>
+      </aside>
+
+      <aside class="channels-panel">
+        <header class="panel-header">
+          <div>
+            <h2 id="space-name">Space</h2>
+            <p id="invite-link" class="muted"></p>
+          </div>
+          <span id="user-role" class="role-pill"></span>
+        </header>
+
+        <div class="channel-groups">
+          <section>
+            <h3>Text Channels</h3>
+            <ul id="text-channels" class="channel-list"></ul>
+          </section>
+          <section>
+            <h3>Private Channels</h3>
+            <ul id="private-channels" class="channel-list"></ul>
+          </section>
+        </div>
+      </aside>
+
+      <main class="chat-panel">
+        <header class="panel-header chat-header">
+          <div>
+            <h2 id="channel-name"># general</h2>
+            <p id="typing-indicator" class="muted"></p>
+          </div>
+          <div class="header-actions" aria-label="Header actions">🔍 📌 👥</div>
+        </header>
+
+        <section id="message-list" class="message-list" aria-live="polite"></section>
+
+        <form id="composer" class="composer">
+          <input id="message-input" placeholder="Message channel..." autocomplete="off" />
+          <button type="submit">Send</button>
+        </form>
+      </main>
+    </div>
+
+    <template id="message-template">
+      <article class="message-item">
+        <div class="message-main">
+          <div class="avatar">U</div>
+          <div class="message-body">
+            <p class="message-meta"><strong></strong> <span></span></p>
+            <p class="message-text"></p>
+            <div class="reactions"></div>
+          </div>
+        </div>
+        <div class="message-actions" aria-label="Message actions">
+          <button data-action="react" aria-label="Add reaction" title="Add reaction">😀</button>
+          <button data-action="edit" aria-label="Edit message" title="Edit message">✏️</button>
+          <button data-action="delete" aria-label="Delete message" title="Delete message">🗑️</button>
+        </div>
+      </article>
+    </template>
+
+    <script src="https://cdn.jsdelivr.net/npm/twemoji@14.0.2/dist/twemoji.min.js" crossorigin="anonymous"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
