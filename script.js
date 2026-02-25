@@ -63,10 +63,42 @@ function parseTwemoji(root = document.body) {
 }
 
 function makeJWT(username) {
-  const payload = btoa(
-    JSON.stringify({ user: username, iat: Date.now(), app: 'speakset' })
-  );
+  const payload = btoa(JSON.stringify({ user: username, iat: Date.now(), app: 'speakset' }));
   return `speakset.${payload}.signature`;
+}
+
+async function apiLogin(username, password) {
+  const response = await fetch('/api/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, password }),
+  });
+  if (!response.ok) {
+    throw new Error('login failed');
+  }
+  return response.json();
+}
+
+async function apiLoadMessages(channel) {
+  const response = await fetch(`/api/messages?channel=${encodeURIComponent(channel)}`);
+  if (!response.ok) {
+    throw new Error('message load failed');
+  }
+  const data = await response.json();
+  return data.messages || [];
+}
+
+async function apiCreateMessage(channel, author, text) {
+  const response = await fetch('/api/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ channel, author, text }),
+  });
+  if (!response.ok) {
+    throw new Error('message create failed');
+  }
+  const data = await response.json();
+  return data.message;
 }
 
 function seedMessages() {
@@ -77,14 +109,14 @@ function seedMessages() {
         id: crypto.randomUUID(),
         author: 'alex',
         text: 'Welcome to Speakset 👋',
-        at: new Date(),
+        at: new Date().toISOString(),
         reactions: {},
       },
       {
         id: crypto.randomUUID(),
         author: 'rhea',
         text: 'Clean. Fast. Private. nailed it. 🔥',
-        at: new Date(),
+        at: new Date().toISOString(),
         reactions: { '🔥': 2 },
       },
     ];
@@ -103,6 +135,16 @@ function getAvatarText(name) {
   return (name || '?').slice(0, 2).toUpperCase();
 }
 
+async function loadMessagesForActiveChannel() {
+  const key = getChannelKey();
+  try {
+    const messages = await apiLoadMessages(key);
+    state.messagesByChannel[key] = messages;
+  } catch (_error) {
+    seedMessages();
+  }
+}
+
 function renderSpaces() {
   spaceList.innerHTML = '';
   state.spaces.forEach((space) => {
@@ -110,9 +152,10 @@ function renderSpaces() {
     const button = document.createElement('button');
     button.className = `space-btn ${space.id === state.activeSpaceId ? 'active' : ''}`;
     button.textContent = space.name;
-    button.onclick = () => {
+    button.onclick = async () => {
       state.activeSpaceId = space.id;
       state.activeChannel = { type: 'text', name: space.channels.text[0] };
+      await loadMessagesForActiveChannel();
       renderAll();
     };
     li.appendChild(button);
@@ -135,8 +178,9 @@ function renderChannels() {
         state.activeChannel.type === type && state.activeChannel.name === channel;
       button.className = `channel-btn ${isActive ? 'active' : ''}`;
       button.textContent = type === 'private' ? `🔒 ${channel}` : `# ${channel}`;
-      button.onclick = () => {
+      button.onclick = async () => {
         state.activeChannel = { type, name: channel };
+        await loadMessagesForActiveChannel();
         renderMessages();
         renderChannels();
       };
@@ -150,7 +194,7 @@ function renderChannels() {
   parseTwemoji(document.querySelector('.channel-groups'));
 }
 
-function renderMessages() {
+function renderMessages(newMessageId = null) {
   const key = getChannelKey();
   const messages = state.messagesByChannel[key] || [];
   channelName.textContent = `${
@@ -158,7 +202,7 @@ function renderMessages() {
   } ${state.activeChannel.name}`;
   messageList.innerHTML = '';
 
-  messages.forEach((msg) => {
+  messages.forEach((msg, index) => {
     const clone = template.content.cloneNode(true);
     const item = clone.querySelector('.message-item');
     const avatar = clone.querySelector('.avatar');
@@ -167,16 +211,25 @@ function renderMessages() {
     const text = clone.querySelector('.message-text');
     const reactions = clone.querySelector('.reactions');
 
+    const previousMessage = messages[index - 1];
+    const isContinuation = previousMessage && previousMessage.author === msg.author;
+
     item.dataset.id = msg.id;
+    if (msg.id === newMessageId) item.classList.add('is-new');
+    if (isContinuation) item.classList.add('continuation');
+
     avatar.textContent = getAvatarText(msg.author);
     author.textContent = msg.author;
-    time.textContent = `Today ${new Date(msg.at).toLocaleTimeString([], {
+
+    const date = new Date(msg.at);
+    time.textContent = `Today ${date.toLocaleTimeString([], {
       hour: 'numeric',
       minute: '2-digit',
     })}`;
+
     text.textContent = msg.text;
 
-    Object.entries(msg.reactions).forEach(([emoji, count]) => {
+    Object.entries(msg.reactions || {}).forEach(([emoji, count]) => {
       const chip = document.createElement('span');
       chip.className = 'reaction-chip';
       chip.textContent = `${emoji} ${count}`;
@@ -225,30 +278,38 @@ function renderAll() {
   renderMessages();
 }
 
-loginForm.addEventListener('submit', (event) => {
+loginForm.addEventListener('submit', async (event) => {
   event.preventDefault();
   const username = usernameInput.value.trim();
   const password = passwordInput.value;
   if (!username || !password) return;
 
-  state.jwt = makeJWT(username);
+  let token = '';
+  try {
+    const loginResult = await apiLogin(username, password);
+    token = loginResult.token;
+  } catch (_error) {
+    token = makeJWT(username);
+  }
+
+  state.jwt = token;
   state.user = {
     username,
     avatarName: avatarInput.files[0]?.name || '',
   };
 
-  authMeta.textContent = `JWT issued for ${username}: ${state.jwt.slice(0, 36)}...`;
+  authMeta.textContent = `JWT issued for ${username}: ${state.jwt.slice(0, 40)}...`;
 
-  setTimeout(() => {
+  setTimeout(async () => {
     authScreen.classList.add('hidden');
     app.classList.remove('hidden');
     state.activeSpaceId = state.spaces[0].id;
-    seedMessages();
+    await loadMessagesForActiveChannel();
     renderAll();
   }, 500);
 });
 
-createSpaceButton.addEventListener('click', () => {
+createSpaceButton.addEventListener('click', async () => {
   const name = prompt('Space name?');
   if (!name || !name.trim()) return;
   const slug = name.trim().toLowerCase().replace(/\s+/g, '-');
@@ -265,6 +326,7 @@ createSpaceButton.addEventListener('click', () => {
   state.spaces.unshift(space);
   state.activeSpaceId = space.id;
   state.activeChannel = { type: 'text', name: 'general' };
+  await loadMessagesForActiveChannel();
   renderAll();
 });
 
@@ -277,7 +339,7 @@ messageInput.addEventListener('input', () => {
   }, 900);
 });
 
-composer.addEventListener('submit', (event) => {
+composer.addEventListener('submit', async (event) => {
   event.preventDefault();
   if (!state.user) return;
 
@@ -286,17 +348,25 @@ composer.addEventListener('submit', (event) => {
 
   const key = getChannelKey();
   state.messagesByChannel[key] = state.messagesByChannel[key] || [];
-  state.messagesByChannel[key].push({
-    id: crypto.randomUUID(),
-    author: state.user.username,
-    text,
-    at: new Date(),
-    reactions: {},
-  });
+
+  let message = null;
+  try {
+    message = await apiCreateMessage(key, state.user.username, text);
+  } catch (_error) {
+    message = {
+      id: crypto.randomUUID(),
+      author: state.user.username,
+      text,
+      at: new Date().toISOString(),
+      reactions: {},
+    };
+  }
+
+  state.messagesByChannel[key].push(message);
 
   typingIndicator.textContent = '';
   messageInput.value = '';
-  renderMessages();
+  renderMessages(message.id);
   messageList.scrollTop = messageList.scrollHeight;
 });
 

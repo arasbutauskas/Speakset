@@ -14,7 +14,7 @@ Speakset is a Discord-inspired recreation for Gen Z, devs, and small communities
 1. **Accounts**
    - Username + password login
    - Optional avatar upload field
-   - Simulated JWT issuance on login
+   - JWT issuance on login (served by Python backend + C++ native helper)
 2. **Spaces**
    - Create Space
    - Invite link preview
@@ -27,9 +27,14 @@ Speakset is a Discord-inspired recreation for Gen Z, devs, and small communities
    - Edit/Delete messages
    - Emoji reactions rendered with Twitter/X-style Twemoji set
 
+## Backend stack (new)
+- **Python**: `backend/server.py` serves static assets and REST APIs (`/api/login`, `/api/messages`, `/api/health`).
+- **C++**: `backend/native/speakset_native.cpp` generates auth tokens and message IDs.
+- Python compiles the C++ helper automatically on first run.
+
 ## Run locally
 ```bash
-python3 -m http.server 4173
+python3 backend/server.py
 ```
 
 Then open `http://localhost:4173`.
